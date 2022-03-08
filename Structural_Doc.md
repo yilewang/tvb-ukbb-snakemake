@@ -23,3 +23,12 @@ a standard-space brain mask is transformed into the native T1 space and applied 
 5. Defacing process
 
 6. Tissue-type segmentation FAST (FMRIB's Automated Segmentation Tool). 
+This step is to create a T1 image with bias-field-correction, to discrete CSF, grey matter and white matter
+
+7. SIENAX analysis
+normalise brain tissue volumes for head size. volumnes generation
+
+8. Subcortical structures modeled by FIRST (FMRIB's Integrated Registration and Segmentation tool)
+The shape and volume output for 15 subcortical regions are generated and stored. 
+
+9. list of the volume measures from SIENAX: total brain (grey + white matter), total white matter volume, total grey matter volum, ventricular, CSF, perpheral cortical grey matter. 
