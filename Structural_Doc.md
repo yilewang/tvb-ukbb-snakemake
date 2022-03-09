@@ -73,10 +73,7 @@ ${FSLDIR}/bin/applywarp --rel --interp=nn --in=${templ}/brainstem --ref=T1 -w T1
 ```
 
 5. Defacing process
-
-for anonymous purpose
-
-code for this part
+This step is for anonymous purpose
 
 ```bash
 #Defacing T1
