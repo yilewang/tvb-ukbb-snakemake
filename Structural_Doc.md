@@ -4,9 +4,9 @@ T1 structural images are referred for all other fMRI modalities. A good quality 
 
 Let's decomposite the TVB-UKBB pipeline in this documentation. We will start from the structural T1 weight imaging
 
-### Workflow of the structural pipeline
+## Workflow of the structural pipeline
 
-1. Gradient distortion correction (GDC)
+### 1. Gradient distortion correction (GDC)
 GDC is to correct the gradient non-linearity in MRI machine. The principle of the MRI imaging is that, MRI machine will create a strong magnetic field (B0) so the hydrogen can orbit in the same/opposite directions (N-S, OR S-N, depends on the high or low energy state). We are living at a 3D world so there are three magnetic fields: X (Left–Right)	Y (Anterior–Posterior) and Z (Head–Foot). In order to localize the proton, each direction has a gradient from top to the end. However, the magnetic field gradient is not perfectly linear in the real world. Becasue of hardware limitation, there is always gradient non-linearity in the magnetic field. From a classical paper **J.Jovicich et al., 2015.**, they developed a new method to do the GDC and eliminate the geometric distortion in the MRI images (see the figure below). 
 
 ![image](https://user-images.githubusercontent.com/37648360/157306856-d8141fb7-02cb-49e5-8c60-98cbb609baa6.png).
@@ -16,7 +16,7 @@ GDC is to correct the gradient non-linearity in MRI machine. The principle of th
 $BB_BIN_DIR/bb_pipeline_tools/bb_GDC --workingdir=./T1_GDC/ --in=T1_orig.nii.gz --out=T1_orig_ud.nii.gz --owarp=T1_orig_ud_warp.nii.gz
 ```
 
-2. Cut down the FOV
+### 2. Cut down the FOV
 The second step is to cut down the Field of view in the brain, to focus on brain tissues and improve quality of the registration. BET (brain extraction tool), FLIRT (FMRIB's linear image registration tool, and MNI152 "non-linear 6th generation" standard-space T1 template will be used in this step. 
 
 
@@ -42,7 +42,7 @@ ${FSLDIR}/bin/convert_xfm -omat T1_to_MNI_linear.mat -concat T1_tmp2_tmp_to_std.
 ```
 
 
-3. Non-linear registration to MNI152 space using FNIRT (FMRIB's non-linear image registration tool). 
+### 3. Non-linear registration to MNI152 space using FNIRT (FMRIB's non-linear image registration tool). 
 All of the transformations estimated in GDC, linear and non-linear transformations to MNI152 are combined into one single non-linear transformation and allows the original T1 to be transformed into MNI152 space
 
 ```bash
@@ -56,7 +56,7 @@ ${FSLDIR}/bin/fnirt --in=T1 --ref=$FSLDIR/data/standard/MNI152_T1_1mm --aff=T1_t
 
 
 
-4. Inverse of the MNI152
+### 4. Inverse of the MNI152
 a standard-space brain mask is transformed into the native T1 space and applied to the T1 image to generate a brain-extracted T1. 
 
 ```bash
@@ -72,7 +72,7 @@ ${FSLDIR}/bin/applywarp --rel --interp=nn --in=${templ}/cerebellum --ref=T1 -w T
 ${FSLDIR}/bin/applywarp --rel --interp=nn --in=${templ}/brainstem --ref=T1 -w T1_to_MNI_warp_coef_inv -o brainstem_to_T1
 ```
 
-5. Defacing process
+### 5. Defacing process
 This step is for anonymous purpose
 
 ```bash
@@ -100,7 +100,7 @@ ${FSLDIR}/bin/fslmaths grot -binv -mul T1 T1
 ```
 
 
-6. Tissue-type segmentation FAST (FMRIB's Automated Segmentation Tool). 
+### 6. Tissue-type segmentation FAST (FMRIB's Automated Segmentation Tool). 
 This step is to create a T1 image with bias-field-correction, to discrete CSF, grey matter and white matter
 
 
@@ -136,7 +136,7 @@ fi
 
 
 
-7. Subcortical structures modeled by FIRST (FMRIB's Integrated Registration and Segmentation tool)
+### 7. Subcortical structures modeled by FIRST (FMRIB's Integrated Registration and Segmentation tool)
 The shape and volume output for 15 subcortical regions are generated and stored. 
 
 ```bash
@@ -154,7 +154,7 @@ ${FSLDIR}/bin/fslmaths T1_first/subcort_upperthresh_seg -add T1_first/subcort_lo
 ${FSLDIR}/bin/fslmaths T1_fast/T1_brain_GM_mask_noCerebBS -add T1_first/subcort_GM -bin cort_subcort_GM
 ```
 
-8. SIENAX analysis & VMB
+### 8. SIENAX analysis & VMB
 normalise brain tissue volumes for head size. volumnes generation
 
 ```bash
@@ -169,7 +169,7 @@ $BB_BIN_DIR/bb_structural_pipeline/bb_vbm `pwd`/..
 
 
 
-9. BIANCA (Brain Intensity AbNormality Classification Algorithm) is a tool to automatically differentiate white matter hyperintensities. 
+### 9. BIANCA (Brain Intensity AbNormality Classification Algorithm) is a tool to automatically differentiate white matter hyperintensities. 
 
 
 
@@ -204,7 +204,7 @@ fi
 ```
 
 
-10. label the grey matter with ROIs
+### 10. label the grey matter with ROIs
 
 ```bash
 #label GM with ROIs
