@@ -11,8 +11,6 @@ GDC is to correct the gradient non-linearity in MRI machine. The principle of th
 
 ![image](https://user-images.githubusercontent.com/37648360/157306856-d8141fb7-02cb-49e5-8c60-98cbb609baa6.png).
 
-Here is the GDC part in tvb-ukbb pipeline
-
 ```bash
 #Calculate and apply the Gradient Distortion Unwarp ###NO GDC###
 $BB_BIN_DIR/bb_pipeline_tools/bb_GDC --workingdir=./T1_GDC/ --in=T1_orig.nii.gz --out=T1_orig_ud.nii.gz --owarp=T1_orig_ud_warp.nii.gz
@@ -21,7 +19,6 @@ $BB_BIN_DIR/bb_pipeline_tools/bb_GDC --workingdir=./T1_GDC/ --in=T1_orig.nii.gz 
 2. Cut down the FOV
 The second step is to cut down the Field of view in the brain, to focus on brain tissues and improve quality of the registration. BET (brain extraction tool), FLIRT (FMRIB's linear image registration tool, and MNI152 "non-linear 6th generation" standard-space T1 template will be used in this step. 
 
-code for this step:
 
 ```bash
 # to calculate the length of the whole brain in z dimension
@@ -48,8 +45,6 @@ ${FSLDIR}/bin/convert_xfm -omat T1_to_MNI_linear.mat -concat T1_tmp2_tmp_to_std.
 3. Non-linear registration to MNI152 space using FNIRT (FMRIB's non-linear image registration tool). 
 All of the transformations estimated in GDC, linear and non-linear transformations to MNI152 are combined into one single non-linear transformation and allows the original T1 to be transformed into MNI152 space
 
-code for this part
-
 ```bash
 #Non-linear registration of T1 to MNI using the previously calculated alignment
 ${FSLDIR}/bin/fnirt --in=T1 --ref=$FSLDIR/data/standard/MNI152_T1_1mm --aff=T1_to_MNI_linear.mat \
@@ -65,7 +60,16 @@ ${FSLDIR}/bin/fnirt --in=T1 --ref=$FSLDIR/data/standard/MNI152_T1_1mm --aff=T1_t
 a standard-space brain mask is transformed into the native T1 space and applied to the T1 image to generate a brain-extracted T1. 
 
 ```bash
+#Create brain mask and mask T1
+${FSLDIR}/bin/invwarp --ref=T1 -w T1_to_MNI_warp_coef -o T1_to_MNI_warp_coef_inv
+${FSLDIR}/bin/applywarp --rel --interp=nn --in=$templ/MNI152_T1_1mm_brain_mask --ref=T1 -w T1_to_MNI_warp_coef_inv -o T1_brain_mask
+${FSLDIR}/bin/fslmaths T1 -mul T1_brain_mask T1_brain
+${FSLDIR}/bin/fslmaths T1_brain_to_MNI -mul $templ/MNI152_T1_1mm_brain_mask T1_brain_to_MNI
 
+#register parcellation, cerebellar & brainstem masks to T1
+${FSLDIR}/bin/applywarp --rel --interp=nn --in=$PARC_IMG --ref=T1 -w T1_to_MNI_warp_coef_inv -o parcel_to_T1
+${FSLDIR}/bin/applywarp --rel --interp=nn --in=${templ}/cerebellum --ref=T1 -w T1_to_MNI_warp_coef_inv -o cerebellum_to_T1
+${FSLDIR}/bin/applywarp --rel --interp=nn --in=${templ}/brainstem --ref=T1 -w T1_to_MNI_warp_coef_inv -o brainstem_to_T1
 ```
 
 5. Defacing process
