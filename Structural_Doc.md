@@ -2,7 +2,12 @@
 
 T1 structural images are referred for all other fMRI modalities. A good quality of the structural images is vital for all subsequent processing.
 
-Let's decomposite the TVB-UKBB pipeline in this documentation. We will start from the structural T1 weight imaging
+Let's decomposite the TVB-UKBB pipeline in this documentation. We will start from the structural T1 weight imaging.
+
+The pipeline workflow of this process could be found in **F. Alfaro-Almagro et al., 2018** neuroimage paper.
+
+![image](https://user-images.githubusercontent.com/37648360/157475349-307a3eb3-8574-4b8f-97af-6a5f9df0e7ae.png)
+
 
 ## Workflow of the structural pipeline
 
