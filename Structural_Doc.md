@@ -22,10 +22,13 @@ $BB_BIN_DIR/bb_pipeline_tools/bb_GDC --workingdir=./T1_GDC/ --in=T1_orig.nii.gz 
 ```
 
 ### 2. Cut down the FOV
-The second step is to cut down the Field of view in the brain, to focus on brain tissues and improve quality of the registration. BET (brain extraction tool), FLIRT (FMRIB's linear image registration tool, and MNI152 "non-linear 6th generation" standard-space T1 template will be used in this step. 
+The second step is to cut down the Field of view in the brain, to focus on brain tissues and improve quality of the registration. **BET** (brain extraction tool), **FLIRT** (FMRIB's linear image registration tool), and MNI152 "non-linear 6th generation" standard-space T1 template will be used in this step. 
 
 
 ```bash
+
+cp T1_orig.nii.gz T1_orig_ud.nii.gz
+
 # to calculate the length of the whole brain in z dimension
 #Calculate where does the brain start in the z dimension and then extract the roi
 head_top=`${FSLDIR}/bin/robustfov -i T1_orig_ud | grep -v Final | head -n 1 | awk '{print $5}'`
