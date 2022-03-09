@@ -159,9 +159,10 @@ ${FSLDIR}/bin/fslmaths T1_first/subcort_upperthresh_seg -add T1_first/subcort_lo
 ${FSLDIR}/bin/fslmaths T1_fast/T1_brain_GM_mask_noCerebBS -add T1_first/subcort_GM -bin cort_subcort_GM
 ```
 
-### 8. SIENAX analysis & VMB
-normalise brain tissue volumes for head size. volumnes generation
+### 8. SIENAX analysis & VBM
+to normalise brain tissue volumes for head size. volumnes generation in the SIENAX analysis.
 
+For the VBM, it is a tool to calculate voxel-wise differences in the grey matter. Sometimes, the differences in functional MRI can be caused by the grey matter differences. So VBM is a great tool to test the differences between subjects. It will use the non-linear transformation to convert all the subject's T1 image to a standard space, then compare them.
 ```bash
 #Run Siena
 $BB_BIN_DIR/bb_structural_pipeline/bb_sienax `pwd`/..
@@ -174,9 +175,9 @@ $BB_BIN_DIR/bb_structural_pipeline/bb_vbm `pwd`/..
 
 
 
-### 9. BIANCA (Brain Intensity AbNormality Classification Algorithm) is a tool to automatically differentiate white matter hyperintensities. 
+### 9. BIANCA (Brain Intensity AbNormality Classification Algorithm)
 
-
+BIANCA is a tool to automatically differentiate white matter hyperintensities. 
 
 ```bash
 #Run BIANCA
