@@ -180,7 +180,7 @@ $BB_BIN_DIR/bb_structural_pipeline/bb_vbm `pwd`/..
 
 ### 9. BIANCA (Brain Intensity AbNormality Classification Algorithm)
 
-BIANCA is a tool to automatically differentiate white matter hyperintensities. 
+BIANCA is a tool to automatically differentiate white matter hyperintensities.
 
 ```bash
 #Run BIANCA
@@ -213,7 +213,9 @@ fi
 ```
 
 
-### 10. label the grey matter with ROIs
+### 10. label the grey matter with ROIs (region of interests)
+
+We want to have our brain regions paracellation. It requires AFNI package.
 
 ```bash
 #label GM with ROIs
