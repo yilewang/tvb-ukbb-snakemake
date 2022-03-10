@@ -10,6 +10,10 @@ This doc is to summarize the resting state fmri preprocessing in the tvb-ukbb pi
 
 ## 2. rs-fMRI FEAT/Melodic
 
+FEAT is a software tool for high quality model-based FMRI data analysis.
+
+Melodic is Multivariate Exploratory Linear Optimized Decomposition into Independent Components. 
+
 ## 3. FIX
 
 ## 4. functional connectivity
