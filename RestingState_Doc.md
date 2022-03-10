@@ -5,3 +5,11 @@ This doc is to summarize the resting state fmri preprocessing in the tvb-ukbb pi
 ![image](https://user-images.githubusercontent.com/37648360/157544150-6e5ceb0d-90f2-4e32-908c-f36b56fc65bf.png)
 
 ![image](https://user-images.githubusercontent.com/37648360/157547046-4d802439-6e39-4777-b9fd-5e9c0985a109.png)
+
+## 1. post structural
+
+## 2. rs-fMRI FEAT/Melodic
+
+## 3. FIX
+
+## 4. functional connectivity
