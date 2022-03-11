@@ -1,5 +1,6 @@
 # Steps of Diffusion Tensor Imaging preprocessing in tvb-ukbb pipeline
 
+![image](https://user-images.githubusercontent.com/37648360/157889185-d77b3de0-0900-497e-8d6f-ea526d7fff5a.png)
 
 
 ## 1. running pre-eddy
