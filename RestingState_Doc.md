@@ -8,7 +8,7 @@ This doc is to summarize the resting state fmri preprocessing in the tvb-ukbb pi
 
 ## 1. post structural
 
-Post structural step aims to collect the necessary files from T1w analyses. Bascially, it will need `T1.nii.gz`,`T1_brain.nii.gz`, T1 to MNI152 results `T1_brain2MNI152_T1_2mm_brain_warp.nii.gz` files and partial volume image (PVE) file (to create a mask). 
+Post structural step aims to collect the necessary files from T1w analyses. Bascially, it will need `T1.nii.gz`,`T1_brain.nii.gz`, T1 to MNI152 results `T1_brain2MNI152_T1_2mm_brain_warp.nii.gz` files and partial volume image (PVE) file (to create a mask called `WM_seg.nii.gz`). 
 
 ```bash
 direc=$PWD/$1
