@@ -8,6 +8,25 @@ This doc is to summarize the resting state fmri preprocessing in the tvb-ukbb pi
 
 ## 1. post structural
 
+Post structural step aims to collect the necessary files from T1w analyses. Bascially, it will need `T1.nii.gz`,`T1_brain.nii.gz`, T1 to MNI152 results `T1_brain2MNI152_T1_2mm_brain_warp.nii.gz` files and partial volume image (PVE) file (to create a mask). 
+
+```bash
+direc=$PWD/$1
+
+linkDir=$direc/fMRI/symlink
+
+mkdir $linkDir
+
+ln -s ${direc}/T1/T1.nii.gz $linkDir/T1.nii.gz
+ln -s ${direc}/T1/T1_brain.nii.gz $linkDir/T1_brain.nii.gz
+ln -s ${direc}/T1/transforms/T1_to_MNI_warp.nii.gz $linkDir/T1_brain2MNI152_T1_2mm_brain_warp.nii.gz
+ln -s ${direc}/T1/transforms/T1_to_MNI_linear.mat $linkDir/T1_brain2MNI152_T1_2mm_brain.mat
+
+$FSLDIR/bin/fslmaths $direc/T1/T1_fast/T1_brain_pve_2.nii.gz -thr 0.5 -bin $linkDir/T1_brain_wmseg.nii.gz
+
+```
+
+
 ## 2. rs-fMRI FEAT/Melodic
 
 FEAT is a software tool for high quality model-based FMRI data analysis.
