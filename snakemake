@@ -307,11 +307,11 @@ rule fslmathsDeFacingT1:
 #### Run fast
 rule T1_fast:
     input:
-
+        "T1_brain"
     output:
         "T1_fast/T1_brain"
     shell:
-        "${FSLDIR}/bin/fast -b -o T1_fast/T1_brain T1_brain"
+        "${FSLDIR}/bin/fast -b -o T1_fast/T1_brain {input}"
 
 #### Binarize PVE masks
 
