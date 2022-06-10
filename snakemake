@@ -303,7 +303,7 @@ rule fslmathsDeFacingT1:
 
 
 
-
+!!!!! need check
 #### Run fast
 rule T1_fast:
     input:
@@ -319,17 +319,23 @@ rule T1_fast:
 #### remove cerebellum and brainstem from GM and WM mask
 rule GMmask
     input:
-
+        mask = "T1_fast/T1_brain_GM_mask"
+        cere2T1 = "transforms/cerebellum_to_T1"
+        bs2T1 = "transforms/brainstem_to_T1"
     output:
-
+        "T1_fast/T1_brain_GM_mask_noCerebBS"
     shell:
-        "${FSLDIR}/bin/fslmaths T1_fast/T1_brain_GM_mask -sub transforms/cerebellum_to_T1 -sub transforms/brainstem_to_T1 -bin T1_fast/T1_brain_GM_mask_noCerebBS"
+        "${FSLDIR}/bin/fslmaths {input.mask} -sub {input.cere2T1} -sub {input.bs2T1} -bin {output}"
 
 rule WMmask:
     input:
+        mask = "T1_fast/T1_brain_WM_mask"
+        cere2T1 = "transforms/cerebellum_to_T1"
+        bs2T1 = "transforms/brainstem_to_T1"
     output:
+        "T1_fast/T1_brain_WM_mask_noCerebBS"
     shell:
-        "${FSLDIR}/bin/fslmaths T1_fast/T1_brain_WM_mask -sub transforms/cerebellum_to_T1 -sub transforms/brainstem_to_T1 -bin T1_fast/T1_brain_WM_mask_noCerebBS"
+        "${FSLDIR}/bin/fslmaths {input.mask} -sub {input.cere2T1} -sub {input.bs2T1} -bin {output}"
 
 #### Apply bias field correction to T1
 
@@ -343,45 +349,57 @@ rule WMmask:
 #### Creates a link inside T1_first to ./T1_unbiased_brain.nii.gz (In the present working directory)
 rule linkinside:
     input:
+        "../T1_unbiased_brain.nii.gz"
     output:
+        "T1_first/T1_unbiased_brain.nii.gz"
     shell:
-        'ln -s ../T1_unbiased_brain.nii.gz T1_first/T1_unbiased_brain.nii.gz'
+        "ln -s {input} {output}"
     
 rule runfirstall:
     input:
+        "T1_first/T1_unbiased_brain"
     output:
+        "T1_first/T1_first"
     shell:
-        'ln -s ../T1_unbiased_brain.nii.gz T1_first/T1_unbiased_brain.nii.gz'
+        "${FSLDIR}/bin/run_first_all -i {input} -b -o {output}"
 
 #### Add FIRST subcortical segmentation to GM segmentation without brainstem
-rule 
+rule subcortUpperSeg
     input:
-
+        "T1_first/T1_first_all_fast_firstseg"
     output:
-
+        "T1_first/subcort_upperthresh_seg"
     shell:
-        "${FSLDIR}/bin/fslmaths T1_first/T1_first_all_fast_firstseg -uthr 15 T1_first/subcort_upperthresh_seg"
+        "${FSLDIR}/bin/fslmaths {input} -uthr 15 {output}"
 
-rule 
+rule subcortLowerSeg
     input:
-
+        "T1_first/T1_first_all_fast_firstseg"
     output:
-
+        "T1_first/subcort_lowerthresh_seg"
     shell:
-        "${FSLDIR}/bin/fslmaths T1_first/T1_first_all_fast_firstseg -thr 17 T1_first/subcort_lowerthresh_seg"
+        "${FSLDIR}/bin/fslmaths {input} -thr 17 {output}"
 
-rule 
+rule subcort_GM:
     input:
+        upper="T1_first/subcort_upperthresh_seg"
+        lower="T1_first/subcort_lowerthresh_seg"
     output:
+        "T1_first/subcort_GM"
     shell:
-        "${FSLDIR}/bin/fslmaths T1_first/subcort_upperthresh_seg -add T1_first/subcort_lowerthresh_seg -bin T1_first/subcort_GM"
+        "${FSLDIR}/bin/fslmaths {input.upper} -add {input.lower} -bin {output}"
 
-rule 
+rule cort_subcort_GM:
     input:
+        GMmask="T1_fast/T1_brain_GM_mask_noCerebBS"
+        GM="T1_first/subcort_GM"
     output:
+        "cort_subcort_GM"
     shell:
-        "${FSLDIR}/bin/fslmaths T1_fast/T1_brain_GM_mask_noCerebBS -add T1_first/subcort_GM -bin cort_subcort_GM"
+        "${FSLDIR}/bin/fslmaths {input.GMmask} -add {input.GM} -bin {output}"
 
+
+!!!!! need check
 #### Run Siena
 rule Siena:
     input:
@@ -396,11 +414,6 @@ rule VBM:
         "$BB_BIN_DIR/bb_structural_pipeline/bb_vbm `pwd`/.."
 
 #### Generate noise-related QC metrics
-
-
-
-
-
 #### Run BIANCA
 rule BIANCA:
     input:
@@ -409,25 +422,86 @@ rule BIANCA:
         '$BB_BIN_DIR/bb_structural_pipeline/bb_BIANCA $1'
 #### remove BIANCA estimated lesion voxels from GM masks & add to WM mask
 
+rule mask2preBIANCA:
+    input:
+    output:
+    shell:
+        "cp $1/T1/T1_fast/T1_brain_GM_mask.nii.gz $1/T1/T1_fast/T1_brain_GM_mask_preBIANCA.nii.gz"
+
+rule createGMmask:
+    input:
+    output:
+    shell:
+        "${FSLDIR}/bin/fslmaths $1/T1/T1_fast/T1_brain_GM_mask_preBIANCA -sub $1/T2_FLAIR/lesions/final_mask -bin $1/T1/T1_fast/T1_brain_GM_mask"
+
+rule noCerebs2preBIANCA:
+    input:
+    output:
+    shell:
+        "cp $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS.nii.gz $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS_preBIANCA.nii.gz"
+
+rule GMmaskNocerebs:
+    input:
+    output:
+    shell:
+        "${FSLDIR}/bin/fslmaths $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS_preBIANCA -sub $1/T2_FLAIR/lesions/final_mask -bin $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS"
+
+rule subcort_GM2preBIANCA:
+    input:
+    output:
+    shell:
+        "cp $1/T1/cort_subcort_GM.nii.gz $1/T1/cort_subcort_GM_preBIANCA.nii.gz"
+
+rule create_cort_subcort_GM:
+    input:
+    output:
+    shell:
+        "${FSLDIR}/bin/fslmaths $1/T1/cort_subcort_GM_preBIANCA -sub $1/T2_FLAIR/lesions/final_mask -bin $1/T1/cort_subcort_GM"
+
+rule WMmask2preBIANCA:
+    input:
+    output:
+    shell:
+        "cp $1/T1/T1_fast/T1_brain_WM_mask.nii.gz $1/T1/T1_fast/T1_brain_WM_mask_preBIANCA.nii.gz"
+
+rule create_WMmask:
+    input:
+    output:
+    shell:
+        "${FSLDIR}/bin/fslmaths $1/T1/T1_fast/T1_brain_WM_mask_preBIANCA -add $1/T2_FLAIR/lesions/final_mask -bin $1/T1/T1_fast/T1_brain_WM_mask"
+
+rule WMmaskNoCerebs2preBIANCA:
+    input:
+    output:
+    shell:
+        "cp $1/T1/T1_fast/T1_brain_WM_mask_noCerebBS.nii.gz $1/T1/T1_fast/T1_brain_WM_mask_noCerebBS_preBIANCA.nii.gz"
+
+rule create_WMmaskNocerebs:
+    input:
+    output:
+    shell:
+        "${FSLDIR}/bin/fslmaths $1/T1/T1_fast/T1_brain_WM_mask_noCerebBS_preBIANCA -add $1/T2_FLAIR/lesions/final_mask -bin $1/T1/T1_fast/T1_brain_WM_mask_noCerebBS"
+
+
+
 
 #### create GM-WM interface for dMRI tractography seeds
-
-
-rule :
+rule GMWMdil:
     input:
-
+        "$1/T1/T1_fast/T1_brain_GM_mask_noCerebBS"
     output:
-        
+        "$1/T1/T1_fast/T1_brain_GM_mask_noCerebBS_dil"
     shell:
-        "${FSLDIR}/bin/fslmaths $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS -kernel sphere 1 -dilM $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS_dil"
+        "${FSLDIR}/bin/fslmaths {input} -kernel sphere 1 -dilM {output}"
 
-rule :
+rule GMWMinterface:
     input:
-
+        dil = "$1/T1/T1_fast/T1_brain_GM_mask_noCerebBS_dil"
+        WMmask = "$1/T1/T1_fast/T1_brain_WM_mask_noCerebBS"
     output:
-
+        "$1/T1/interface"
     shell:
-        "${FSLDIR}/bin/fslmaths $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS_dil -add $1/T1/T1_fast/T1_brain_WM_mask_noCerebBS -thr 2 -bin $1/T1/interface"
+        "${FSLDIR}/bin/fslmaths {input.dil} -add {input.WMmask} -thr 2 -bin {output}"
 
 #### check interface, re-do with extra dilation if empty
 
