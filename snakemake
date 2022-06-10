@@ -1,9 +1,7 @@
-SAMPLES = ["case1", "case2"]
+SAMPLES = ["s123873"]
 
 
 rule all:
-    input:
-        
 
 
 #### convert raw T1 to T1_Orig
@@ -424,63 +422,88 @@ rule BIANCA:
 
 rule mask2preBIANCA:
     input:
+        "$1/T1/T1_fast/T1_brain_GM_mask.nii.gz"
     output:
+        "$1/T1/T1_fast/T1_brain_GM_mask_preBIANCA.nii.gz"
     shell:
-        "cp $1/T1/T1_fast/T1_brain_GM_mask.nii.gz $1/T1/T1_fast/T1_brain_GM_mask_preBIANCA.nii.gz"
+        "cp {input} {output}"
 
 rule createGMmask:
     input:
+        pre="$1/T1/T1_fast/T1_brain_GM_mask_preBIANCA"
+        finalmask="$1/T2_FLAIR/lesions/final_mask"
     output:
+        "$1/T1/T1_fast/T1_brain_GM_mask"
     shell:
-        "${FSLDIR}/bin/fslmaths $1/T1/T1_fast/T1_brain_GM_mask_preBIANCA -sub $1/T2_FLAIR/lesions/final_mask -bin $1/T1/T1_fast/T1_brain_GM_mask"
+        "${FSLDIR}/bin/fslmaths {input.pre} -sub {input.finalmask}-bin {output}"
 
 rule noCerebs2preBIANCA:
     input:
+        "$1/T1/T1_fast/T1_brain_GM_mask_noCerebBS.nii.gz"
     output:
+        "$1/T1/T1_fast/T1_brain_GM_mask_noCerebBS_preBIANCA.nii.gz"
     shell:
-        "cp $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS.nii.gz $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS_preBIANCA.nii.gz"
+        "cp {input} {output}"
 
 rule GMmaskNocerebs:
     input:
+        pre="$1/T1/T1_fast/T1_brain_GM_mask_noCerebBS_preBIANCA"
+        finalmask="$1/T2_FLAIR/lesions/final_mask"
     output:
+        "$1/T1/T1_fast/T1_brain_GM_mask_noCerebBS"
     shell:
-        "${FSLDIR}/bin/fslmaths $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS_preBIANCA -sub $1/T2_FLAIR/lesions/final_mask -bin $1/T1/T1_fast/T1_brain_GM_mask_noCerebBS"
+        "${FSLDIR}/bin/fslmaths {input.pre} -sub {input.finalmask} -bin {output}"
 
 rule subcort_GM2preBIANCA:
     input:
+        "$1/T1/cort_subcort_GM.nii.gz"
     output:
+        "$1/T1/cort_subcort_GM_preBIANCA.nii.gz"
     shell:
-        "cp $1/T1/cort_subcort_GM.nii.gz $1/T1/cort_subcort_GM_preBIANCA.nii.gz"
+        "cp {input} {output}"
 
 rule create_cort_subcort_GM:
     input:
+        pre="$1/T1/cort_subcort_GM_preBIANCA"
+        finalmask="$1/T2_FLAIR/lesions/final_mask"
     output:
+        "$1/T1/cort_subcort_GM"
     shell:
-        "${FSLDIR}/bin/fslmaths $1/T1/cort_subcort_GM_preBIANCA -sub $1/T2_FLAIR/lesions/final_mask -bin $1/T1/cort_subcort_GM"
+        "${FSLDIR}/bin/fslmaths {input.pre} -sub {input.finalmask} -bin {output}"
 
 rule WMmask2preBIANCA:
     input:
+        "$1/T1/T1_fast/T1_brain_WM_mask.nii.gz"
     output:
+        "$1/T1/T1_fast/T1_brain_WM_mask_preBIANCA.nii.gz"
     shell:
-        "cp $1/T1/T1_fast/T1_brain_WM_mask.nii.gz $1/T1/T1_fast/T1_brain_WM_mask_preBIANCA.nii.gz"
+        "cp {input} {output}"
 
 rule create_WMmask:
     input:
+        pre="$1/T1/T1_fast/T1_brain_WM_mask_preBIANCA"
+        finalmask="$1/T2_FLAIR/lesions/final_mask"
     output:
+        "$1/T1/T1_fast/T1_brain_WM_mask"
     shell:
-        "${FSLDIR}/bin/fslmaths $1/T1/T1_fast/T1_brain_WM_mask_preBIANCA -add $1/T2_FLAIR/lesions/final_mask -bin $1/T1/T1_fast/T1_brain_WM_mask"
+        "${FSLDIR}/bin/fslmaths {input.pre} -add {input.finalmask} -bin {output}"
 
 rule WMmaskNoCerebs2preBIANCA:
     input:
+        "$1/T1/T1_fast/T1_brain_WM_mask_noCerebBS.nii.gz"
     output:
+        "$1/T1/T1_fast/T1_brain_WM_mask_noCerebBS_preBIANCA.nii.gz"
     shell:
-        "cp $1/T1/T1_fast/T1_brain_WM_mask_noCerebBS.nii.gz $1/T1/T1_fast/T1_brain_WM_mask_noCerebBS_preBIANCA.nii.gz"
+        "cp {input} {output}"
 
 rule create_WMmaskNocerebs:
     input:
+        pre="$1/T1/T1_fast/T1_brain_WM_mask_noCerebBS_preBIANCA"
+        finalmask="$1/T2_FLAIR/lesions/final_mask"
     output:
+        "$1/T1/T1_fast/T1_brain_WM_mask_noCerebBS"
     shell:
-        "${FSLDIR}/bin/fslmaths $1/T1/T1_fast/T1_brain_WM_mask_noCerebBS_preBIANCA -add $1/T2_FLAIR/lesions/final_mask -bin $1/T1/T1_fast/T1_brain_WM_mask_noCerebBS"
+        "${FSLDIR}/bin/fslmaths {input.pre} -add {input.finalmask} -bin {output}"
 
 
 
